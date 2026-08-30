@@ -1,0 +1,126 @@
+﻿Website: https://www.indmoney.com/
+AMC : SBI
+Pages on which the RAG will be built
+INDmoney — Scheme Pages
+1. SBI Large Cap Fund — formerly SBI BlueChip Fund
+https://www.indmoney.com/mutual-funds/sbi-large-cap-fund-direct-growth
+
+
+2. SBI Flexicap Fund
+https://www.indmoney.com/mutual-funds/sbi-flexicap-fund-direct-growth
+ 
+3. SBI ELSS Tax Saver Fund — formerly SBI Long Term Equity Fund
+https://www.indmoney.com/mutual-funds/sbi-elss-tax-saver-fund-direct-growth
+ 
+4. SBI Midcap Fund
+https://www.indmoney.com/mutual-funds/sbi-midcap-fund-direct-growth
+ 
+5. SBI Small Cap Fund
+https://www.indmoney.com/mutual-funds/sbi-small-cap-fund-direct-plan-growth
+________________
+
+
+SBI Mutual Fund — SID / KIM Documents
+6. SBI BlueChip Fund — Scheme Information Document
+https://www.sbimf.com/docs/default-source/scheme-portfolios/default-library/sid---sbi-bluechip-fund1d0cd92660064395ab092fb9e5ee7c79.pdf
+ 
+7. SBI BlueChip Fund — Key Information Memorandum
+https://www.sbimf.com/docs/default-source/default-library/kim---sbi-blue-chip-fund32655f1826bd4e598e32b00e729fb603.pdf
+ 
+8. SBI Flexicap Fund — Scheme Information Document
+https://www.sbimf.com/docs/default-source/default-library/sid---sbi-flexicap-fund6c696fdab92a47019f5c32d91c967d62.pdf
+ 
+9. SBI Flexicap Fund — Key Information Memorandum
+https://www.sbimf.com/docs/default-source/default-library/kim---sbi-flexicap-fund0bc48eb83bf949309a7d16b37b3031b0.pdf
+ 
+10. SBI Long Term Equity / ELSS — Scheme Information Document
+https://www.sbimf.com/docs/default-source/scheme-portfolios/default-library/sid---sbi-long-term-equity-fund386480308ef94fa0b9113c8f2911e7f8.pdf
+ 
+11. SBI Small Cap Fund — Scheme Information Document
+https://www.sbimf.com/docs/default-source/lists/sid_kim/sid---sbi-small-cap-fund.pdf
+ 
+12. SBI Small Cap Fund — Key Information Memorandum
+https://www.sbimf.com/docs/default-source/sif-forms/kim---sbi-small-cap-fund.pdf
+ 
+13. SBI Midcap Fund — Scheme Information Document
+https://www.sbimf.com/docs/default-source/default-library/sid---sbi-magnum-midcap-fund2a5c652f53c14e80b25de06be5cb228e.pdf
+________________
+
+
+SBI Mutual Fund — Factsheets / Fees / Tax
+14. SBI ELSS Tax Saver Fund — January 2026 Factsheet
+https://www.sbimf.com/docs/default-source/scheme-factsheets/sbi-elss-tax-saver-fund-factsheet-january-2026.pdf
+ 
+15. SBI Mutual Fund — February 2026 Comparative Factsheet
+https://www.sbimf.com/docs/default-source/scheme-factsheets/all-sbimf-schemes-factsheet-february-2026.pdf
+ 16. SBI Mutual Fund — January 2026 Direct Plan Factsheet
+https://www.sbimf.com/docs/default-source/scheme-factsheets/all-sbimf-schemes-factsheet-january-2026.pdf
+ 
+17. SBI Mutual Fund — Total Expense Ratio
+https://www.sbimf.com/total-expense-ratio
+
+
+18. SBI Mutual Fund — Statement of Additional Information
+https://www.sbimf.com/docs/default-source/documents/statement-of-additional-information.pdf
+
+
+19. SBI Mutual Fund — Tax Reckoner FY 2026–27
+https://www.sbimf.com/docs/default-source/pdf/sbi-mf-tax-reckoner-fy-2026-27.pdf
+
+
+20. SBI Mutual Fund — SID / KIM Repository
+https://www.sbimf.com/offer-document-sid-kim
+________________
+SEBI / AMFI Supporting Sources
+For a stronger research corpus, I'd add these regulatory sources.
+21. SEBI — Mutual Fund Filings
+https://www.sebi.gov.in/filings/mutual-funds.html
+22. SEBI — SBI Mutual Fund Filings
+https://www.sebi.gov.in/sebiweb/other/OtherAction.do?doGetFundDetails=yes&mfId=49&type=3
+23. SEBI — Mutual Fund Scheme Categorisation
+https://www.sebi.gov.in/web/?file=https%3A%2F%2Fwww.sebi.gov.in%2Fsebi_data%2Fattachdocs%2Ffeb-2026%2F1772079826878.pdf
+24. SEBI — SBI Mutual Fund Disclosure Document
+https://www.sebi.gov.in/sebi_data/mutualfundfile/dec-2024/1734347478952.pdf
+25. AMFI — SBI Mutual Fund Scheme Document
+AMFI — SBI Mutual Fund Scheme Document
+https://portal.amfiindia.com/spages/4675.pdf
+
+
+Scope your corpus: – only and only above link nothing beyond that. 
+* FAQ assistant (working prototype):
+   * Answers factual queries only (e.g., “Expense ratio of ?”, “ELSS lock-in?”, “Minimum SIP?”, “Exit load?”, “Riskometer/benchmark?”, “How to download capital-gains statement?”).
+   * Shows one clear citation link in every answer.
+   * Refuses opinionated/portfolio questions (e.g., “Should I buy/sell?”) with a polite, facts-only message and a relevant educational link.
+   * Tiny UI: welcome line + 3 example questions and a note: “Facts-only. No investment advice.”
+Key constraints
+* **Public sources only.** No screenshots of the app back-end; no third-party blogs as sources.
+* **No PII.** Do not accept/store PAN, Aadhaar, account numbers, OTPs, emails, or phone numbers.
+* **No performance claims.** Don’t compute/compare returns; link to the official factsheet if asked.
+* **Clarity & transparency.** Keep answers ≤3 sentences; add “Last updated from sources: ”.
+
+
+What are we building : A RAG Based chatbot + it a protypes/hobby project to test RAG. 
+RAG :- 
+Data Ingestion: 
+1. Uploading Document 
+2. Chunking 
+   1. Use as per the data above ( 5 URLs give) 
+3. Embedding 
+   1. Free and light weight embedding model
+   2. sentence-transformers/all-MiniLM-L6-v2 ( huggingface) 
+4. Storing in the vector space 
+   1. ChormaDB 
+Data retrieval 
+1. Question 
+2. Embedding 
+   1. Same 
+3. Find the right chunk from vector space 
+4. LLM Prompt generation
+   1. Which LLM 
+      1. Mistral API Key 
+5. Answer generation 
+UI 
+1. Simple Basic UI 
+2. Color - Groww website color
+3. Streamlit 
+Add Edge Case Testing

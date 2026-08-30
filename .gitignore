@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+streamlit*.log
+streamlit.log.err
+data/Untitled

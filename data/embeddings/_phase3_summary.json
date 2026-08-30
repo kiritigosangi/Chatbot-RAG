@@ -1,0 +1,15 @@
+{
+  "phase": 3,
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_dim": 384,
+  "embedded_chunk_count": 375,
+  "wrong_dim_chunk_ids": [],
+  "sources": [
+    {
+      "source_id": 24,
+      "chunk_count": 375,
+      "dim": 384
+    }
+  ],
+  "jsonl_path": "data/embeddings/embeddings.jsonl"
+}

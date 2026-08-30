@@ -1,0 +1,22 @@
+{
+  "phase": 1,
+  "ingest_at": "2026-08-30T09:26:22Z",
+  "ok": 1,
+  "skipped": 0,
+  "records": [
+    {
+      "source_id": 24,
+      "url": "https://www.sebi.gov.in/sebi_data/mutualfundfile/dec-2024/1734347478952.pdf",
+      "scheme": "regulatory",
+      "doc_type": "sebi",
+      "title": "SEBI SBI Mutual Fund disclosure document",
+      "document_date": "December 2024",
+      "ingest_at": "2026-08-30T09:26:22Z",
+      "status": "ok",
+      "origin": "fetch",
+      "binary_path": "data/raw/pdf/24.pdf",
+      "raw_text_chars": 266615,
+      "text_path": "data/raw/text/24.json"
+    }
+  ]
+}

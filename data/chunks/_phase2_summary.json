@@ -1,0 +1,18 @@
+{
+  "phase": 2,
+  "ok_sources": 1,
+  "chunk_count": 375,
+  "max_chunk_chars_budget": 900,
+  "oversize_chunk_ids": [],
+  "missing_url_chunk_ids": [],
+  "url_not_in_allowlist_chunk_ids": [],
+  "sources": [
+    {
+      "source_id": 24,
+      "url": "https://www.sebi.gov.in/sebi_data/mutualfundfile/dec-2024/1734347478952.pdf",
+      "chunk_count": 375,
+      "max_chunk_chars": 900
+    }
+  ],
+  "jsonl_path": "data/chunks/chunks.jsonl"
+}

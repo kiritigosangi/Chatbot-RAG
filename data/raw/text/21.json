@@ -1,0 +1,13 @@
+{
+  "source_id": 21,
+  "url": "https://www.sebi.gov.in/filings/mutual-funds.html",
+  "scheme": "regulatory",
+  "doc_type": "sebi",
+  "title": "SEBI mutual fund filings",
+  "raw_text": "SEBI | Filings - Mutual Funds\nHome\n»\nFilings\n»\nMutual Funds\nMutual Funds\nDraft\nStatement of Additional Information (SAI)\nScheme Information Document (SID)\nKey Information Memorandum (KIM)",
+  "document_date": null,
+  "ingest_at": "2026-08-30T07:22:39Z",
+  "status": "ok",
+  "origin": "fetch",
+  "binary_path": "data/raw/html/21.html"
+}
