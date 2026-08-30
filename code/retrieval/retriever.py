@@ -1,8 +1,9 @@
-"""Core retrieval: embed the question and query the local Chroma collection.
+"""Core retrieval: embed the question and query the active vector store.
 
 Implements Phase 5 process:
   1. embed question with the same MiniLM used for ingest;
-  2. query top-k nearest chunks;
+  2. query top-k nearest chunks (Neon pgvector by default, local Chroma when
+     STORAGE=chroma);
   3. when a scheme is named, prefer that scheme's chunks (post-filter /
      metadata filter) so the answer never mixes schemes (E12);
   4. signal no-coverage / weak similarity rather than invent facts.
@@ -12,8 +13,8 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+from config import storage_backend
 from embedding.model import embed_texts
-from vector_store.store import get_collection
 
 DEFAULT_K = 5
 # Chroma cosine space reports distance = 1 - cosine_similarity to the best
@@ -33,15 +34,14 @@ def retrieve(
 ) -> dict[str, Any]:
     """Return top-k chunks for a question, preferring `scheme` when given."""
     query_vector = embed_texts([question])[0]
-    collection = get_collection()
 
     # General query first.
-    general = _query(collection, query_vector, k=k)
+    general = _query_any(query_vector, k=k)
     chunks = general
 
     # If a scheme is named, re-query restricted to that scheme and prefer it.
     if scheme is not None:
-        filtered = _query(collection, query_vector, k=k, where={"scheme": scheme})
+        filtered = _query_any(query_vector, k=k, scheme=scheme)
         if filtered:
             chunks = filtered
 
@@ -57,7 +57,30 @@ def retrieve(
     }
 
 
-def _query(
+def _query_any(
+    query_vector: list[float],
+    *,
+    k: int,
+    scheme: str | None = None,
+) -> list[dict[str, Any]]:
+    """Query the active storage backend (Neon pgvector or local Chroma)."""
+    if storage_backend() == "neon":
+        from vector_store.neon_store import query_top_k
+
+        return query_top_k(query_vector, k=k, scheme=scheme)
+
+    from vector_store.store import get_collection
+
+    collection = get_collection()
+    return _query_chroma(
+        collection,
+        query_vector,
+        k=k,
+        where={"scheme": scheme} if scheme is not None else None,
+    )
+
+
+def _query_chroma(
     collection: Any,
     query_vector: list[float],
     *,

@@ -1,0 +1,6 @@
+streamlit>=1.36
+psycopg[binary]>=3.2
+pgvector>=0.3
+fastembed>=0.4
+python-dotenv>=1.0
+numpy>=1.26

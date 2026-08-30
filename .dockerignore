@@ -1,0 +1,16 @@
+.git
+.venv
+data
+.env
+__pycache__
+*.pyc
+streamlit*.log
+*.docx
+*.ipynb
+run_phase*.py
+run_retrieval.py
+run_neon.py
+ui_smoke.py
+verify_vector_db.py
+vercel.json
+RAG Chatbot.txt
