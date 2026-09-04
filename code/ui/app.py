@@ -173,35 +173,20 @@ def _render_chat(role: str, content: str, *, citation: str | None = None) -> Non
             st.caption(_txt("citation", url=citation))
 
 
-def _inject_style(theme: str, font_scale: float) -> None:
-    base = "#ffffff" if theme == "light" else "#0e1117"
-    secondary = "#f0f2f6" if theme == "light" else "#262730"
-    text = "#31333f" if theme == "light" else "#fafafa"
-    border = "rgba(49, 51, 63, 0.2)" if theme == "light" else "rgba(250, 250, 250, 0.2)"
+def _inject_style(font_scale: float) -> None:
+    """App styling. Theme colors are delegated to Streamlit's native light/dark
+    selection (Settings menu, top-right corner), so this CSS stays theme-agnostic."""
     fs = 16 * font_scale
 
     st.markdown(
         f"""<style>
-        :root {{ color-scheme: {theme}; }}
-        .stApp {{
-            --background-color: {base};
-            --secondary-background-color: {secondary};
-            --text-color: {text};
-            --sidebar-background-color: {secondary};
-            --widget-background-color: {base};
-            --border-color: {border};
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-size: {fs:.1f}px;
-        }}
-        section[data-testid="stSidebar"] {{
-            background-color: {secondary};
-            color: {text};
-        }}
-        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {{ color: {text}; }}
-        .stChatMessage {{ font-size: {fs:.1f}px; }}
-        [data-testid="stChatInput"] textarea {{ font-size: {fs:.1f}px; }}
+        .stApp {{ font-size: {fs:.1f}px; }}
+
+        /* Brand header: "SBI Mutual Funds" text, then logo, then accent "Chat-bot" */
         .brand-header {{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             margin: 0;
@@ -211,45 +196,64 @@ def _inject_style(theme: str, font_scale: float) -> None:
         .brand-header-lg {{ font-size: {fs * 1.65:.1f}px; }}
         .brand-header-sm {{ font-size: {fs * 1.2:.1f}px; }}
         .brand-header .accent {{ color: #7c3aed; }}
+        .brand-header img {{
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 2px;
+        }}
+
+        /* Chat input: darker field with a visible accent border */
+        [data-testid="stChatInput"] {{
+            background: #1f2430;
+            border: 2px solid #7c3aed;
+            border-radius: 12px;
+        }}
+        [data-testid="stChatInput"]:focus-within {{ border-color: #a78bfa; }}
+        [data-testid="stChatInput"] textarea {{
+            background: transparent;
+            color: #fafafa;
+            font-size: {fs:.1f}px;
+        }}
+
+        .stChatMessage {{ font-size: {fs:.1f}px; }}
         .tb-btn {{
-            border: 1px solid {border};
+            border: 1px solid rgba(128, 128, 128, 0.55);
             border-radius: 8px;
             padding: 0.15rem 0.6rem;
             font-size: {fs * 0.95:.1f}px;
             background: transparent;
-            color: {text};
+            color: inherit;
         }}
-        [data-testid="stSidebar"] hr {{ border-color: {border}; }}
         </style>""",
         unsafe_allow_html=True,
     )
 
 
 def _brand_html(size: str) -> str:
-    """Brand title + optional logo, inlined as base64 so it works regardless of how
-    static assets are served (works on both light and dark themes via a white chip)."""
-    title = "SBI Mutual Funds <span class='accent'>Chat-bot</span>"
+    """Brand header: "SBI Mutual Funds" text first, then the logo, then accent
+    "Chat-bot". Logo is inlined as base64 so it works regardless of asset serving."""
+    parts = ["<span>SBI Mutual Funds</span>"]
     if _HAS_LOGO:
         import base64
 
         b64 = base64.b64encode(LOGO_PATH.read_bytes()).decode()
-        logo = (
-            f"<img src='data:image/png;base64,{b64}' "
-            f"style='height:38px;width:38px;object-fit:contain;border-radius:8px;"
-            f"background:white;padding:2px;vertical-align:middle;margin-right:10px;'/>"
+        parts.append(
+            f"<img src='data:image/png;base64,{b64}' alt='SBI Mutual Funds logo'/>"
         )
-    else:
-        logo = ""
-    return f'<div class="brand-header {size}">{logo}{title}</div>'
+    parts.append("<span class='accent'>Chat-bot</span>")
+    return f'<div class="brand-header {size}">{"".join(parts)}</div>'
 
 
 def _render_toolbar() -> None:
-    """A-/A+ text size, theme, and language controls above the header."""
+    """A-/A+ text size and language controls above the header. Dark/light theme is
+    switched from the Streamlit corner menu: top-right ⮫ / Settings -> Theme."""
     fs = st.session_state.get("font_scale", 1.0)
-    theme = st.session_state.get("theme", "light")
     lang = _lang()
 
-    c1, c2, c3, c4, _spacer = st.columns([1, 1, 1, 1, 5])
+    c1, c2, c3, _spacer = st.columns([1, 1, 1, 6])
 
     with c1:
         if st.button("A−", key="tb_font_minus", help=_txt("decrease_text")):
@@ -264,11 +268,6 @@ def _render_toolbar() -> None:
             )
             st.rerun()
     with c3:
-        icon = "🌙" if theme == "light" else "☀️"
-        if st.button(icon, key="tb_theme", help=_txt("theme_tooltip")):
-            st.session_state.theme = "dark" if theme == "light" else "light"
-            st.rerun()
-    with c4:
         target = "हिं" if lang == "en" else "EN"
         tip_key = "lang_tooltip_en" if lang == "en" else "lang_tooltip_hi"
         if st.button(target, key="tb_lang", help=_txt(tip_key)):
@@ -394,14 +393,13 @@ def main() -> None:
         st.session_state.messages = []
     if "lang" not in st.session_state:
         st.session_state.lang = "en"
-    if "theme" not in st.session_state:
-        st.session_state.theme = "light"
     if "font_scale" not in st.session_state:
         st.session_state.font_scale = 1.0
 
-    _inject_style(st.session_state.theme, st.session_state.font_scale)
+    _inject_style(st.session_state.font_scale)
 
-    # Controls on top of the header: text size, theme, language
+    # Controls on top of the header: text size + language. Theme is switched from
+    # the Streamlit corner menu (top-right ⮫ -> Settings -> Theme).
     _render_toolbar()
 
     st.markdown(_brand_html("brand-header-lg"), unsafe_allow_html=True)
