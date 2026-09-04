@@ -175,12 +175,14 @@ def _render_chat(role: str, content: str, *, citation: str | None = None) -> Non
 
 def _inject_style(font_scale: float) -> None:
     """App styling. Theme colors are delegated to Streamlit's native light/dark
-    selection (Settings menu, top-right corner), so this CSS stays theme-agnostic."""
-    fs = 16 * font_scale
+    selection (Settings menu, top-right corner), so the CSS stays theme-agnostic.
+    Whole-page text scaling uses `zoom` on the app container so sidebar, inputs,
+    chat body, and header all grow together instead of only the title."""
+    zoom = font_scale
 
     st.markdown(
         f"""<style>
-        .stApp {{ font-size: {fs:.1f}px; }}
+        [data-testid="stAppViewContainer"] {{ zoom: {zoom:.2f}; }}
 
         .brand-header {{
             font-weight: 800;
@@ -189,17 +191,21 @@ def _inject_style(font_scale: float) -> None:
             padding: 0;
             line-height: 1.15;
         }}
-        .brand-header-lg {{ font-size: {fs * 1.65:.1f}px; }}
-        .brand-header-sm {{ font-size: {fs * 1.2:.1f}px; }}
+        .brand-header-lg {{ font-size: 26.4px; }}
+        .brand-header-sm {{ font-size: 19.2px; }}
         .brand-header .accent {{ color: #7c3aed; }}
 
-        .stChatMessage {{ font-size: {fs:.1f}px; }}
-        [data-testid="stChatInput"] textarea {{ font-size: {fs:.1f}px; }}
-        .tb-btn {{
-            border: 1px solid rgba(128, 128, 128, 0.55);
-            border-radius: 8px;
-            padding: 0.15rem 0.6rem;
-            font-size: {fs * 0.95:.1f}px;
+        /* Chat input: highlighted field with a black border */
+        [data-testid="stChatInput"] {{
+            background: rgba(255, 215, 130, 0.18);
+            border: 2px solid #111111;
+            border-radius: 10px;
+        }}
+        [data-testid="stChatInput"]:focus-within {{
+            border-color: #111111;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+        }}
+        [data-testid="stChatInput"] textarea {{
             background: transparent;
             color: inherit;
         }}
