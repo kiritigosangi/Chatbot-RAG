@@ -85,7 +85,9 @@ def _handle_question(question: str) -> None:
         return
 
     _render_chat("user", question)
-    st.session_state.messages.append({"role": "user", "content": question})
+    st.session_state.messages.append(
+        {"role": "user", "content": question, "asked_at": _utc_iso_now()}
+    )
 
     try:
         result = _export_answer(question)
@@ -139,8 +141,56 @@ def _handle_question(question: str) -> None:
             st.write(c["text"])
 
 
+def _short(text: str, limit: int = 60) -> str:
+    text = " ".join(text.strip().split())
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _render_sidebar() -> None:
+    """Left-hand drawer with chat history and quick actions."""
+    with st.sidebar:
+        st.markdown("### 💬 Chat History")
+        st.caption("Questions you asked in this session.")
+
+        if st.button("➕ New Chat", use_container_width=True, type="primary"):
+            st.session_state.messages = []
+            st.rerun()
+
+        st.divider()
+
+        user_msgs = [m for m in st.session_state.messages if m["role"] == "user"]
+        if not user_msgs:
+            st.info("No chats yet. Ask a question below to start.")
+        else:
+            st.caption(f"{len(user_msgs)} question(s) asked")
+            for idx, m in enumerate(reversed(user_msgs), start=1):
+                if st.button(
+                    f"{idx}. {_short(m['content'])}",
+                    key=f"hist_{idx}",
+                    use_container_width=True,
+                ):
+                    # Persist across the rerun so the question is processed below.
+                    st.session_state.pending = m["content"]
+                    st.rerun()
+
+        st.divider()
+
+        if user_msgs:
+            last = user_msgs[-1]
+            st.markdown("**Last asked**")
+            st.write(_short(last["content"], limit=120))
+            asked_at = last.get("asked_at", "")
+            if asked_at:
+                st.caption(f"at {asked_at[:19].replace('T', ' ')} UTC")
+
+        st.caption("Facts-only. No investment advice.")
+
+
 def main() -> None:
     st.set_page_config(page_title=PAGE_TITLE, page_icon="💰", layout="centered")
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
     st.title("SBI Mutual Funds FAQ")
     st.markdown(
@@ -148,9 +198,6 @@ def main() -> None:
         "INDmoney + SBI/SEBI/AMFI documents."
     )
     st.caption("**Facts-only. No investment advice.**")
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
 
     # Clickable examples
     st.markdown("**Try an example:**")
@@ -168,7 +215,7 @@ def main() -> None:
             if msg.get("last_updated"):
                 st.caption(msg["last_updated"])
 
-    # Samples that were clicked but not yet rendered
+    # Samples / history-replay that were clicked but not yet handled
     pending = st.session_state.pop("pending", None)
     if pending:
         _handle_question(pending)
@@ -176,6 +223,9 @@ def main() -> None:
     prompt = st.chat_input("Ask a factual question about an SBI scheme…")
     if prompt:
         _handle_question(prompt)
+
+    # Drawer last so it always reflects the latest session state.
+    _render_sidebar()
 
 
 if __name__ == "__main__":
