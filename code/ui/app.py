@@ -182,11 +182,7 @@ def _inject_style(font_scale: float) -> None:
         f"""<style>
         .stApp {{ font-size: {fs:.1f}px; }}
 
-        /* Brand header: "SBI Mutual Funds" text, then logo, then accent "Chat-bot" */
         .brand-header {{
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             margin: 0;
@@ -196,29 +192,9 @@ def _inject_style(font_scale: float) -> None:
         .brand-header-lg {{ font-size: {fs * 1.65:.1f}px; }}
         .brand-header-sm {{ font-size: {fs * 1.2:.1f}px; }}
         .brand-header .accent {{ color: #7c3aed; }}
-        .brand-header img {{
-            height: 40px;
-            width: auto;
-            object-fit: contain;
-            border-radius: 8px;
-            background: white;
-            padding: 2px;
-        }}
-
-        /* Chat input: darker field with a visible accent border */
-        [data-testid="stChatInput"] {{
-            background: #1f2430;
-            border: 2px solid #7c3aed;
-            border-radius: 12px;
-        }}
-        [data-testid="stChatInput"]:focus-within {{ border-color: #a78bfa; }}
-        [data-testid="stChatInput"] textarea {{
-            background: transparent;
-            color: #fafafa;
-            font-size: {fs:.1f}px;
-        }}
 
         .stChatMessage {{ font-size: {fs:.1f}px; }}
+        [data-testid="stChatInput"] textarea {{ font-size: {fs:.1f}px; }}
         .tb-btn {{
             border: 1px solid rgba(128, 128, 128, 0.55);
             border-radius: 8px;
@@ -233,18 +209,21 @@ def _inject_style(font_scale: float) -> None:
 
 
 def _brand_html(size: str) -> str:
-    """Brand header: "SBI Mutual Funds" text first, then the logo, then accent
-    "Chat-bot". Logo is inlined as base64 so it works regardless of asset serving."""
-    parts = ["<span>SBI Mutual Funds</span>"]
+    """Brand title + optional logo, inlined as base64 so it works regardless of how
+    static assets are served (works on both light and dark themes via a white chip)."""
+    title = "SBI Mutual Funds <span class='accent'>Chat-bot</span>"
     if _HAS_LOGO:
         import base64
 
         b64 = base64.b64encode(LOGO_PATH.read_bytes()).decode()
-        parts.append(
-            f"<img src='data:image/png;base64,{b64}' alt='SBI Mutual Funds logo'/>"
+        logo = (
+            f"<img src='data:image/png;base64,{b64}' "
+            f"style='height:38px;width:38px;object-fit:contain;border-radius:8px;"
+            f"background:white;padding:2px;vertical-align:middle;margin-right:10px;'/>"
         )
-    parts.append("<span class='accent'>Chat-bot</span>")
-    return f'<div class="brand-header {size}">{"".join(parts)}</div>'
+    else:
+        logo = ""
+    return f'<div class="brand-header {size}">{logo}{title}</div>'
 
 
 def _render_toolbar() -> None:
